@@ -63,5 +63,13 @@ CAPTION_SCRIPT;
 			$post->info->singlephoto = $form->singlephoto->value;
 		}
 	}
+	
+	/*
+	 * Make usable URL available through $post->singlephoto
+	 */
+	public function filter_post_singlephoto($singlephoto, $post)
+	{
+		return Media::get($post->info->singlephoto)->url;
+	}
 }
 ?>
