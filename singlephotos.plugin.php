@@ -69,7 +69,39 @@ CAPTION_SCRIPT;
 	 */
 	public function filter_post_singlephoto($singlephoto, $post)
 	{
-		return Media::get($post->info->singlephoto)->url;
+		return str_replace(" ", "%20", Media::get($post->info->singlephoto)->url);
+	}
+	
+	/**
+	 * Make usable thumb URL available through $post->singlephoto_thumb
+	 */
+	public function filter_post_singlephoto_thumb($thumb, $post)
+	{
+		$url = Media::get($post->info->singlephoto)->url;
+		$url = dirname($url) . "/thumbs/" . basename($url);
+		return str_replace(" ", "%20", $url);
+	}
+	
+	/**
+	 * Add photosets to the output (0.9 method)
+	 */
+	public function filter_template_user_filters( $filters ) 
+	{
+		// Cater for the home page which uses presets as of d918a831
+		if ( isset( $filters['preset'] ) ) {
+			if(isset($filters['content_type'])) {
+				$filters['content_type'] = Utils::single_array( $filters['content_type'] );
+			}
+			$filters['content_type'][] = Post::type( 'photo' );
+			$filters['content_type'][] = Post::type( 'entry' );
+		} else {		
+			// Cater for other pages like /page/1 which don't use presets yet
+			if ( isset( $filters['content_type'] ) ) {
+				$filters['content_type'] = Utils::single_array( $filters['content_type'] );
+				$filters['content_type'][] = Post::type( 'photo' );
+			}
+		}
+		return $filters;
 	}
 }
 ?>
